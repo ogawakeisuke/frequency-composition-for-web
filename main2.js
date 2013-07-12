@@ -20,6 +20,24 @@ $(document).ready(function() {
     };
   }
 
+  
+  /*
+  // とりあえずサイン波オシレータ
+  */
+
+  function sinetone(freq) {
+    var phase = 0,
+        phaseStep = freq / pico.samplerate;
+    return {
+        process: function(L, R) {
+            for (var i = 0; i < L.length; i++) {
+                L[i] = R[i] = Math.sin(6.28318 * phase) * 0.25;
+                phase += phaseStep;
+            }
+        }
+    };
+  }
+
 
 
   /*
@@ -36,11 +54,11 @@ $(document).ready(function() {
   $("#start").on("click", function() { 
     var count = 0;
     var num = 128;
-    var oscArray = new Array(num);
+    var cycloydArray = new Array(num);
     var threshould = 0;
     var circ;
-    for(var i = 0; i < oscArray.length; ++i) { 
-      oscArray[i] = new Cycloyd(Math.random() * 10);
+    for(var i = 0; i < cycloydArray.length; ++i) { 
+      cycloydArray[i] = new Cycloyd(Math.random() * 10);
     };
 
     var paper = Raphael("svg", 1280, 1000);
@@ -49,13 +67,13 @@ $(document).ready(function() {
     setInterval(function() {
       count = counter(count);
       paper.clear();
-      for(var i = 0; i < oscArray.length; ++i) { 
-        oscArray[i].dynamic(count);
+      for(var i = 0; i < cycloydArray.length; ++i) { 
+        cycloydArray[i].dynamic(count);
         
-        circ = paper.circle(oscArray[i].val * 30000 + 400,150, 7);
+        circ = paper.circle(cycloydArray[i].val * 30000 + 400,150, 7);
       }
-    
 
+      pico.play(sinetone(count));
 
       // pico.play({
       //   process: function(L, R) {
@@ -68,6 +86,12 @@ $(document).ready(function() {
     },20);
 
   })
+
+  $(window).mousemove(function(e){
+    var dx = e.clientX;
+    
+    pico.play(sinetone(dx));
+  });
 
 
   $("#stop").on("click", function() { 
