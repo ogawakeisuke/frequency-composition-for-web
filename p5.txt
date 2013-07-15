@@ -1,0 +1,330 @@
+import oscP5.*;
+import netP5.*;
+OscP5 oscP5;
+
+NetAddress myRemoteLocation;
+NetAddress myRemoteLocation2;
+
+import processing.opengl.*;
+import javax.media.opengl.*;
+float angleX;
+float angleY;
+float angleZ;
+float angle;
+
+float  FAx;
+float  FAy;
+float  FAz;
+float FAA;
+boolean off;
+
+
+
+int NUM =3000;
+int Scale =100;
+int nummin;
+Cyclemax3[] cycles3=new Cyclemax3[NUM]; 
+Cyclemax2[] cycles2=new Cyclemax2[NUM]; 
+Cyclemax[] cycles=new Cyclemax[NUM]; 
+
+PGraphicsOpenGL pgl;
+GL gl;
+
+void setup(){
+  colorMode(HSB);
+  oscP5 = new OscP5(this,12000);
+  oscP5 = new OscP5(this,12001);
+  myRemoteLocation = new NetAddress("127.0.0.1",12000);
+  myRemoteLocation2 = new NetAddress("127.0.0.1",12001);
+
+
+  size(1280,800,OPENGL);
+  hint(ENABLE_OPENGL_4X_SMOOTH);
+  for(int i=0;i<NUM;i++){
+    cycles3[i] = new Cyclemax3();
+    cycles2[i] = new Cyclemax2();
+    cycles[i] = new Cyclemax();
+  }
+  pgl =(PGraphicsOpenGL) g;
+  gl = pgl.gl;
+}
+
+void draw(){
+  noCursor();
+
+
+  background(0);
+
+  pgl.beginGL();
+  gl.glEnable(GL.GL_DEPTH_TEST);
+  gl.glEnable(GL.GL_BLEND);
+  gl.glBlendFunc(GL.GL_ONE,GL.GL_ONE);
+  pgl.endGL();
+
+  for(int i=0;i<NUM; i++){  
+    cycles2[i].move2();
+  }
+  for(int i=0;i<NUM; i++){  
+    cycles3[i].move3();
+  }
+
+
+  angleX =cycles2[0].F2x*1000;
+  angleY =30*cos(cycles2[0].F2y);
+  angleZ =300*cos(cycles2[0].F2y);
+  rotateY(angleY/15);
+  rotateX(angle/3);
+  FAA =sin(angle/3);
+  //rotateZ(angle/5);
+  angle += 0.01;
+
+
+
+
+  for(int j=1;j<mouseX-1; j++){
+
+
+    //stroke(dist(cycles[j-1].ex,cycles[j-1].ey,cycles[j].ex,cycls[j].ey));//random demo ii
+    //float clr= dist(cycles[j-1].ex,cycles[j-1].ey,cycles[j].ex,cycles[j].ey);
+    // fill(clr/60,clr/600,width/20);
+
+    float F3x= cycles2[j-1].F2x;
+    float F3y= cycles2[j].F2y;
+    float F3z= cycles2[j+1].F2z;
+
+    float F4x =F3x*sin(j);
+    float F4y =F3y*cos(j);
+    float F4z =F3z*tan(j);    
+
+    //int  eI =int(random(2000));
+    int  eI =int(millis()/5000);
+    float Frx =F3x*sin(eI);
+    float Fry =F3y*cos(eI);
+    float Frz =F3z*tan(eI);    
+
+    float G2x =eI*cycles3[j].G2x*Frx;
+    float G2y =eI*cycles3[j].G2y*Fry;
+    float G2z =eI*cycles3[j].G2z*Frz;
+
+
+//    line(700+F4z*angleX,250+F4x*angleX,200+F4y*angleX,700+F4z*angleX+1,250+F4x*angleX+1,200+F4y*angleX+1); 
+
+
+    pushMatrix();
+
+    translate(700+F4z*angleX,250+F4x*angleX,200+F4y*angleX);  
+
+
+    noFill();
+
+    if(keyPressed){
+      if(key =='z'){
+        stroke(255);
+        box(1,1,1);    
+      }   
+    }
+    if(keyPressed){
+      if(key =='x'||key=='c'){
+        stroke(cycles2[j-1].F2x*300,cycles2[j].F2y+200,cycles2[j+1].F2z*100);
+
+        box(mouseX*10,10,mouseY*10);
+        box(1,1,1);
+      }   
+    }
+
+    popMatrix();
+
+    F4x= cycles2[j].F2x*sin(j);
+    F4y= cycles2[j].F2y*cos(j);
+    F4z= cycles2[j].F2z*tan(j);
+    FAx=F4x;
+    FAy=F4y;
+    FAz=F4z;  
+  }
+
+
+
+  if(keyPressed){
+    if(key =='z'){
+      OscMessage myMessage8 = new OscMessage("/test8");
+      myMessage8.add(0);
+      oscP5.send(myMessage8, myRemoteLocation2);
+    }   
+  }
+
+
+  if(keyPressed){
+    if(key =='x'||key=='c'){
+      OscMessage myMessage5 = new OscMessage("/test5");
+      myMessage5.add(cycles2[1].F2x);
+      oscP5.send(myMessage5, myRemoteLocation2);
+      OscMessage myMessage6 = new OscMessage("/test6");
+      myMessage6.add(cycles2[1].F2y);
+      oscP5.send(myMessage6, myRemoteLocation2);
+      OscMessage myMessage7 = new OscMessage("/test7");
+      myMessage7.add(cycles2[1].F2z);
+      oscP5.send(myMessage7, myRemoteLocation2);
+
+    }   
+  }
+
+  if(keyPressed){
+    if(key =='c'){
+      OscMessage myMessage9 = new OscMessage("/test9");
+      myMessage9.add(angle);
+      oscP5.send(myMessage9, myRemoteLocation2);
+    }
+
+  }
+
+  OscMessage myMessage = new OscMessage("/test");
+  myMessage.add(FAx);
+  oscP5.send(myMessage, myRemoteLocation);
+  OscMessage myMessage2 = new OscMessage("/test2");
+  myMessage2.add(FAy);
+  oscP5.send(myMessage2, myRemoteLocation);
+  OscMessage myMessage3 = new OscMessage("/test3");
+  myMessage3.add(FAz);
+  oscP5.send(myMessage3, myRemoteLocation);
+
+
+
+
+  if(mousePressed){
+
+
+
+    OscMessage myMessage4 = new OscMessage("/test4");
+    myMessage4.add(FAA);
+    oscP5.send(myMessage4, myRemoteLocation);
+
+  }
+
+  //println("1a  "+cycles[1].ex);
+  //println("2a  "+cycles[2].ex);
+
+
+
+
+}
+
+
+
+int NUMup(){
+  int nummin = 0;
+  if(millis()%1000==0){
+    nummin+=millis()/1000;
+  }
+  return nummin; 
+
+}     
+
+
+
+
+
+
+class Cyclemax{
+  float count,mycount;
+  float a1,a2,b1,b2,a3,b3;  
+  float A1,w1,w2;
+  float k;
+  float X1,X2,X3,ex,ey,ez;//ex,ey,ez okuru
+
+
+  Cyclemax(){
+    count =0;
+    a1 = random(0.1,2.2);
+    a2 = 2.3;
+    a3 = 2.5;
+    b1 = 0.7;
+    b2 = 0.15;  
+    b3 = 0.12;  
+
+    A1 = 1.23;
+    w1   = 1.12;
+    w2   = 0.13;  
+    k    =0.175;   
+  }
+
+  void move(){  
+    X1 = a1*sin(b1 * count);
+    X2 = a2*sin(b2 * count);
+    X3 = a3*cos(b3 * count);
+    float   mycount = X1  / X2;
+    ex = (A1+w1)*cos(mycount)-k*cos((A1+w1)/w1*mycount);
+    ey = (A1-w1)*sin(mycount)-k*sin((A1+w2)/w2*mycount);
+    ez = (A1-w1)*sin(mycount)-k*sin((A1+w2)/w2*mycount);
+    if(mousePressed){
+      count= count;
+    }
+    else{
+      count += 0.01;
+    }   
+  }
+}
+
+class Cyclemax2 extends Cyclemax{
+  float Fx;
+  float Fy;
+  float Fz;
+  float F2x;
+  float F2y;
+  float F2z;
+
+
+  Cyclemax2(){
+
+  }
+
+  void move2(){
+    this.move();
+    Fx= ex*ey;
+    Fy= ey/ez;
+    Fz= ez;
+    F2x =ex*cos(20)-ex*sin(Fx);
+    F2y =ex*sin(20);
+    F2z =ex*tan(Fz);
+
+
+  }
+
+}
+class Cyclemax3 extends Cyclemax{
+  float Gx;
+  float Gy;
+  float Gz;
+  float G2x;
+  float G2y;
+  float G2z;
+  float []Gax = new float[3000];
+
+  Cyclemax3(){
+
+  }
+
+  void move3(){
+    this.move();
+    Gx= cos(radians(mycount*10));
+    Gy= sin(radians(X2));
+    Gz=  sin(mycount*10);
+
+
+    G2x =Gx/sin(10);
+    G2y =Gy/cos(13);
+    G2z =Gy/tan(20);
+
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
