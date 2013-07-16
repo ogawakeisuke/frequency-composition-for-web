@@ -17,8 +17,8 @@ $(document).ready(function() {
       var dynamics = base1 / base2;
 
       this.val = { 
-        x_is : k * Math.cos(dynamics) * Math.sin(dynamics) * 0.2,
-        y_is : k * Math.sin(dynamics) * Math.tan(dynamics) * 0.2 
+        x_is : k * Math.sin(dynamics) * Math.sin(dynamics) * 0.2,
+        y_is : k * Math.cos(dynamics) * Math.cos(dynamics) * 0.2 
       };
     }
   }
@@ -62,7 +62,7 @@ $(document).ready(function() {
     //
     // draw
     //
-    setInterval(function() {
+    function draw() {
       count = counter(count);
       paper.clear();
       for(var i = 0; i < cycloydArray.length; ++i) { 
@@ -81,8 +81,19 @@ $(document).ready(function() {
         tArray.push(T("tri", {freq:0, mul:0.02}).play() );
 
       };
+    };
 
-    },20);
+    // loop
+    var clock = setInterval(draw, 20);
+
+    $(window).mousedown(function() {
+      clearInterval(clock);
+    });
+
+    $(window).mouseup(function() {
+      clock = setInterval(draw, 20);
+    });
+
 
   })
 
