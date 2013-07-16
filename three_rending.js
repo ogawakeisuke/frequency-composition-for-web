@@ -50,7 +50,7 @@ window.addEventListener("DOMContentLoaded", function(){
     theta ++;
 
     renderer.render(scene, camera);
-    requestAnimationFrame(anim);
+    requestAnimationFrame(anim); //setTimeoutに似たようなもの
   };
   anim();
 
