@@ -56,12 +56,13 @@ function init() {
     geometry.colors = colors;
     // マテリアル設定
     var materials = new THREE.ParticleBasicMaterial({
-  map: THREE.ImageUtils.loadTexture("http://jsrun.it/assets/n/J/A/m/nJAmD.png"),
-  depthTest: false,
-  size:100,                              
-  blending: THREE.AdditiveBlending,            
-  transparent: true,
-  vertexColors: true}); 
+      map: THREE.ImageUtils.loadTexture("http://jsrun.it/assets/n/J/A/m/nJAmD.png"),
+      depthTest: false,
+      size:100,                              
+      blending: THREE.AdditiveBlending,            
+      transparent: true,
+      vertexColors: true
+    }); 
     
     // ジオメトリとマテリアルからパーティクルシステム作成
     particles = new THREE.ParticleSystem(geometry, materials);
