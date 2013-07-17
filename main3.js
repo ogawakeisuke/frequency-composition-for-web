@@ -41,7 +41,7 @@ $(document).ready(function() {
 
     // グローバルな変数
     var count = 0;
-    var num = 100;
+    var num = 50;
     var cycloydArray = new Array(num);
     var tArray = new Array(num);
     var bufferTable = new Float32Array(44100);
@@ -81,7 +81,7 @@ $(document).ready(function() {
       document.body.appendChild(renderer.domElement);
       
       scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x000000, 0.0007);
+      scene.fog = new THREE.FogExp2(0x000000, 0.0017);
       
       camera = new THREE.PerspectiveCamera(60, width / height, 1, 3000);
       camera.position.z = 1000;
@@ -110,8 +110,9 @@ $(document).ready(function() {
       geometry.colors = colors;
       // マテリアル設定
       var materials = new THREE.ParticleBasicMaterial({
+        map: THREE.ImageUtils.loadTexture("img/nJAmD.png"),
         depthTest: false,
-        size:10,                              
+        size:30,                              
         blending: THREE.AdditiveBlending,            
         transparent: true,
         vertexColors: true
@@ -150,10 +151,10 @@ $(document).ready(function() {
         //
 
         tArray[i].freq.value = 500 + particles.geometry.vertices[i].x;
-        tArray[i].fb.value = particles.geometry.vertices[i].y * 0.005;
-      
+        tArray[i].phase.value = particles.geometry.vertices[i].y * 0.005;
+        tArray[i].wave = bufferTable;
       };
-
+      bufferUpdate(cycloydArray[0].val.x_is);
       threeRender();
     };
 
@@ -168,7 +169,11 @@ $(document).ready(function() {
       renderer.render(scene, camera);
     }
 
-
+    function bufferUpdate(value) {
+      for (var i = 0; i < bufferTable.length; i++) {
+        bufferTable[i] = Math.sin(Math.PI * value * i);
+      }
+    }
 
     cycloydInit();
     timbleInit();
