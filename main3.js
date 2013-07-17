@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
   /*
   // 三角関数
   */
@@ -54,25 +55,18 @@ $(document).ready(function() {
       tArray[i].play();
     };
 
-    //
-    // 描画のsetup
-    //
-    var paper = Raphael("svg", 1000, 1000);
 
     //
-    // draw
+    // loop
     //
-    function draw() {
+    function loop() {
       count = counter(count);
-      paper.clear();
       for(var i = 0; i < cycloydArray.length; ++i) { 
 
         cycloydArray[i].dynamic(count * 0.002);
-
         var base_cos = cycloydArray[i].val.x_is * 3000;
         var base_sin = cycloydArray[i].val.y_is * 3000;
 
-        circ = paper.circle(500 + base_sin + Math.tan(base_cos) * 20, 250 + base_cos + Math.sin(base_sin) * 10, 1);
         tArray[i].freq.value = 500 + base_sin + Math.tan(base_cos) * 20;
       };
 
@@ -84,7 +78,7 @@ $(document).ready(function() {
     };
 
     // loop
-    var clock = setInterval(draw, 20);
+    var clock = setInterval(loop, 20);
 
     $(window).mousedown(function() {
       clearInterval(clock);
