@@ -4,8 +4,8 @@ $(document).ready(function() {
   // 三角関数
   */
   function Cycloyd(coef){
-    var a1 = 1.6, 
-      a2 = 2.3, 
+    var a1 = 0.6, 
+      a2 = 4.3, 
       b1 = 0.7 * coef, 
       b2 = 0.15 * coef, 
       k = 0.175;
@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     this.dynamic = function(count_is) {
       var base1 = a1 * Math.sin(b1 * count_is );
-      var base2 = a2 * Math.cos(b2 * count_is);
+      var base2 = a2 * Math.asin(b2 * count_is);
       var dynamics = base1 / base2;
 
       this.val = { 
@@ -110,7 +110,7 @@ $(document).ready(function() {
       geometry.colors = colors;
       // マテリアル設定
       var materials = new THREE.ParticleBasicMaterial({
-        map: THREE.ImageUtils.loadTexture("img/nJAmD.png"),
+        //map: THREE.ImageUtils.loadTexture("img/nJAmD.png"),
         depthTest: false,
         size:30,                              
         blending: THREE.AdditiveBlending,            
@@ -151,10 +151,10 @@ $(document).ready(function() {
         //
 
         tArray[i].freq.value = 500 + particles.geometry.vertices[i].x;
-        tArray[i].phase.value = particles.geometry.vertices[i].y * 0.005;
-        tArray[i].wave = bufferTable;
+        tArray[i].phase.value = particles.geometry.vertices[i].y * 0.05;
+       // tArray[i].wave = bufferTable;
       };
-      bufferUpdate(cycloydArray[0].val.x_is);
+      //bufferUpdate(cycloydArray[0].val.x_is);
       threeRender();
     };
 
