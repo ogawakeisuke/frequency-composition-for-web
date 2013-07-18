@@ -37,7 +37,7 @@ $(document).ready(function() {
   // 実行 リファクタリング必要
   */
   $("#start").on("click", function() { 
-
+    $("#start").hide();
 
     // グローバルな変数
     var count = 0;
@@ -49,7 +49,6 @@ $(document).ready(function() {
     // Three.jsで必要な変数
     var renderer, scene, camera, particles;
 
-    
 
     //
     // setup関数
@@ -110,7 +109,7 @@ $(document).ready(function() {
       geometry.colors = colors;
       // マテリアル設定
       var materials = new THREE.ParticleBasicMaterial({
-        //map: THREE.ImageUtils.loadTexture("img/nJAmD.png"),
+        map: THREE.ImageUtils.loadTexture("img/nJAmD.png"),
         depthTest: false,
         size:30,                              
         blending: THREE.AdditiveBlending,            
