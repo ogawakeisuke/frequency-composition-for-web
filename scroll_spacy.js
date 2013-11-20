@@ -12,13 +12,13 @@ $(document).ready(function() {
 
 
     //test
-    var len    = 44100;
-    var buffer = new Float32Array(len);
-    for (var i = 0; i < buffer.length; i++) {
-      buffer[i] = Math.sin(Math.PI * 0.001 * i) * (i/len) * (1-(i/len)) * 2;
-    }
-    buffer = { buffer:buffer, samplerate:22050 };
-    var src = wavb(buffer);  
+    // var len    = 44100;
+    // var buffer = new Float32Array(len);
+    // for (var i = 0; i < buffer.length; i++) {
+    //   buffer[i] = Math.sin(Math.PI * 0.001 * i) * (i/len) * (1-(i/len)) * 2;
+    // }
+    // buffer = { buffer:buffer, samplerate:22050 };
+    // var src = wavb(buffer);  
 
 
 
@@ -29,7 +29,7 @@ $(document).ready(function() {
 
 
       for(var i = 0; i < num; ++i) { 
-        tArray[i] = T("osc", { freq: Math.random()*200 + 200, mul:0.03, wave:wavb }).plot({target:wavbase}).play();
+        tArray[i] = T("osc", { freq: Math.random()*200 + 200, mul:0.03, wave:src }).plot({target:wavbase}).play();
       };
     }
     function wavb(val) {
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 
   $(window).scroll(function () {
-    src = wavb(aTowevb()); 
+    //src = wavb(aTowevb()); 
     
     for(var i = 0; i < num; ++i) { 
       
