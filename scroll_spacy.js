@@ -6,7 +6,7 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 10;
+    var num = 5;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
     var intervalArray = new Array(num);
@@ -31,10 +31,10 @@ $(document).ready(function() {
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
         
-        oscArray[i] = T("tri", { freq: Math.random()*300 + 400, mul:0.03, env:env}).plot({target:wavbase});
+        oscArray[i] = T("tri", { freq: Math.random()*400 + 200, mul:0.03, env:env}).plot({target:wavbase});
         oscArrayOriginFreq[i] = oscArray[i].freq.value;
 
-        var env = T("perc", {a:10, r: 30 * (Math.random()*30)}, oscArray[i]).bang().play();
+        var env = T("adshr", {a:20, r: 300 }, oscArray[i]).bang().play();
 
         var interval = T("param", {value: 20 })
         intervalArrayOriginTime[i] = interval.value
@@ -61,10 +61,9 @@ $(document).ready(function() {
 
   $(window).scroll(function () {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
-    //console.log(intervalArray[0].interval.value = sin_val * 100 );
     for(var i = 0; i < num; ++i) { 
-      oscArray[i].freq.value = 200 + sin_val * oscArrayOriginFreq[i];
-      intervalArray[i].interval.value = Math.sqrt( (sin_val * ( Math.random() * 400 ) * intervalArrayOriginTime[i] ) * (sin_val * ( Math.random() * 400 ) * intervalArrayOriginTime[i] ) )
+      oscArray[i].freq.value = parseInt(200 + sin_val * oscArrayOriginFreq[i]);
+      intervalArray[i].interval.value = sin_val * ( Math.sin($(window).scrollTop() * 0.001) * 400 ) * intervalArrayOriginTime[i]
     }
     console.log(intervalArray[0].interval.value);
     
