@@ -6,23 +6,12 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 5;
+    var num = 100;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
     var intervalArray = new Array(num);
     var intervalArrayOriginTime = new Array(num);
     var src = wavb("00112233445566778877665544332211");  
-
-
-    //test
-    // var len    = 44100;
-    // var buffer = new Float32Array(len);
-    // for (var i = 0; i < buffer.length; i++) {
-    //   buffer[i] = Math.sin(Math.PI * 0.001 * i) * (i/len) * (1-(i/len)) * 2;
-    // }
-    // buffer = { buffer:buffer, samplerate:22050 };
-    // var src = wavb(buffer);  
-
 
 
     //
@@ -53,7 +42,25 @@ $(document).ready(function() {
       }).join("");
     }
 
+    /*　スクロール量で値を変化させる */
+    function scrollAmount() {
+      var value = 0;
+      var scrollVal = 0;
+      return function() {
+        if ( $(window).scrollTop() == scrollVal ) {
+          value -= 1;
+          return value = (value<0)? 0 : value ;
+        }else{
+          scrollVal = $(window).scrollTop();
+          value += 1;
+          return value = (value>50)? 50 : value ;
+        }
+      }
+    }
 
+
+
+    var scrollVal = scrollAmount();
 
     timbleInit();
 
@@ -63,11 +70,20 @@ $(document).ready(function() {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
     for(var i = 0; i < num; ++i) { 
       oscArray[i].freq.value = parseInt(200 + sin_val * oscArrayOriginFreq[i]);
-      intervalArray[i].interval.value = sin_val * ( Math.sin($(window).scrollTop() * 0.001) * 400 ) * intervalArrayOriginTime[i]
+      intervalArray[i].interval.value = sin_val * 40  * intervalArrayOriginTime[i] * Math.random() * 20 
     }
-    console.log(intervalArray[0].interval.value);
+//    console.log(intervalArray[0].interval.value);
     
   });
+
+
+  setInterval(function(){
+    scrollVal();
+  }, 100);
+
+
+
+
 
 
   })();
