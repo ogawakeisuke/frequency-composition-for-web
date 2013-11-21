@@ -21,10 +21,10 @@ $(document).ready(function() {
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
         
-        oscArray[i] = T("sin", { freq: Math.random()*400 + 100, mul:0.03}).plot({target:wavbase});
+        oscArray[i] = T("sin", { freq: Math.random()*400 + 100, mul:0.04}).plot({target:wavbase});
         oscArrayOriginFreq[i] = oscArray[i].freq.value;
 
-        envArray[i] = T("adsr", {a:20, d:500, s:0.2,r: 100 }, oscArray[i]).bang().play();
+        envArray[i] = T("adsr", {a:20, d:500, s:0.2,r: 30 }, oscArray[i]).bang();
 
         //envArrayOriginADSR[i] = 
 
@@ -87,7 +87,8 @@ $(document).ready(function() {
     var array_num = scrollVal();
     
     for(var i=0; i < array_num; i++) {
-      oscArray[i].mul = 0.03;
+      envArray[i].play();
+      oscArray[i].mul = 0.04;
     }
     for(var i=array_num; i < num; i++) {
       oscArray[i].mul = 0.0;
