@@ -21,9 +21,9 @@ $(document).ready(function() {
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
         
-        var env = T("adsr", {a:10,d:250, s:0.04, r: 30 });
-        var osc = T("sin", {freq: Math.random()*400 + 100, mul:0.04}).play();
-        oscArray[i] = T("OscGen", { osc:osc,  env:env } );
+        var env = T("adsr", {a:10,d:250, s:0.03, r: 30 });
+        var osc = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
+        oscArray[i] = T("OscGen", { osc:osc,  env:env } ).play();
         
         oscArrayOriginFreq[i] = oscArray[i].osc.freq.value;
 
@@ -58,7 +58,7 @@ $(document).ready(function() {
       return function() {
         if ( $(window).scrollTop() == scrollVal ) {
           value -= 1;
-          return value = (value<2)? 2 : value ;
+          return value = (value<0)? 0 : value ;
         }else{
           scrollVal = $(window).scrollTop();
           value += 1;
@@ -81,7 +81,6 @@ $(document).ready(function() {
       oscArray[i].osc.freq.value = 200 + sin_val * oscArrayOriginFreq[i];
       intervalArray[i].interval.value = sin_val  * intervalArrayOriginTime[i] * Math.random() * 20 
     }
-    console.log(oscArray[0].osc.freq.value )
     //console.log(intervalArray[0].interval.value);
     //console.log(scaleTonal(oscArray[0].freq.value))
     
@@ -90,15 +89,19 @@ $(document).ready(function() {
 
   setInterval(function(){
     var array_num = scrollVal();
+    var onTable  =  T("perc", {r:100}).bang();
+    var offTable  = T("env", { table: [0.04, [0.0, 100]] }).bang();
     
     for(var i=0; i < array_num; i++) {
-      //oscArray[i].play();
-      oscArray[i].osc.mul = 0.1;
+      oscArray[i].noteOn(70, 100);
+      oscArray[i].env.set({ env:onTable });
     }
     for(var i=array_num; i < num; i++) {
-      oscArray[i].osc.mul = 0.0;
+      oscArray[i].osc.set({ env:onTable });
     }
+    
   }, 150);
+
 
 
 
