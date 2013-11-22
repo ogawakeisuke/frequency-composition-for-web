@@ -6,13 +6,13 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 70;
+    var num = 40;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
     var envArray = new Array(num);
     var intervalArray = new Array(num);
     var intervalArrayOriginTime = new Array(num);
-    var src = wavb("00112233445566778877665544332211");  
+    
 
 
     //
@@ -21,29 +21,34 @@ $(document).ready(function() {
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
         
-        oscArray[i] = T("sin", { freq: Math.random()*400 + 100, mul:0.04}).plot({target:wavbase});
-        oscArrayOriginFreq[i] = oscArray[i].freq.value;
+        var env = T("adsr", {a:10,d:250, s:0.04, r: 30 });
+        var osc = T("sin", {freq: Math.random()*400 + 100, mul:0.04}).play();
+        oscArray[i] = T("OscGen", { osc:osc,  env:env } );
+        
+        oscArrayOriginFreq[i] = oscArray[i].osc.freq.value;
 
-        envArray[i] = T("adsr", {a:20, d:500, s:0.2,r: 30 }, oscArray[i]).bang();
+        
 
-        //envArrayOriginADSR[i] = 
+        // //envArrayOriginADSR[i] = 
 
-        var interval = T("param", {value: 200 })
+        var interval = T("param", {value: 300 })
         intervalArrayOriginTime[i] = interval.value
-        intervalArray[i] = T("interval", {interval:interval}, envArray[i]).start();
+        intervalArray[i] = T("interval", {interval:interval}, oscArray[i]).start();
 
       }
     }
 
-
-    function wavb(val) {
-      return "wavb("+val+")"
+    function mtof(val) {
+      return Math.floor(440*Math.pow(2, (val-69)/12));
     }
 
-    function aTowevb() {
-      return $.map( oscArray, function(val) {
-        return parseInt(val.freq.value).toString(16);
-      }).join("");
+
+    function ftom(frequency) {
+      return(69+12*Math.log(frequency/440)/Math.log(2))
+    }
+
+    function scaleTonal(freq) {
+      return mtof(parseInt(ftom(freq) ) ) 
     }
 
     /*　スクロール量で値を変化させる */
@@ -67,18 +72,18 @@ $(document).ready(function() {
     var scrollVal = scrollAmount();
 
     timbleInit();
-    console.log(envArray[0].table )
-
-
+    
 
   $(window).scroll(function () {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
 
     for(var i = 0; i < num; ++i) { 
-      oscArray[i].freq.value = parseInt(200 + sin_val * oscArrayOriginFreq[i]);
+      oscArray[i].osc.freq.value = 200 + sin_val * oscArrayOriginFreq[i];
       intervalArray[i].interval.value = sin_val  * intervalArrayOriginTime[i] * Math.random() * 20 
     }
-//    console.log(intervalArray[0].interval.value);
+    console.log(oscArray[0].osc.freq.value )
+    //console.log(intervalArray[0].interval.value);
+    //console.log(scaleTonal(oscArray[0].freq.value))
     
   });
 
@@ -87,11 +92,11 @@ $(document).ready(function() {
     var array_num = scrollVal();
     
     for(var i=0; i < array_num; i++) {
-      envArray[i].play();
-      oscArray[i].mul = 0.04;
+      //oscArray[i].play();
+      oscArray[i].osc.mul = 0.1;
     }
     for(var i=array_num; i < num; i++) {
-      oscArray[i].mul = 0.0;
+      oscArray[i].osc.mul = 0.0;
     }
   }, 150);
 
