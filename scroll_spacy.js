@@ -6,7 +6,7 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 20;
+    var num = 5;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
     
@@ -19,6 +19,7 @@ $(document).ready(function() {
     // setup関数
     //
     function timbleInit() {
+
       for(var i = 0; i < num; ++i) { 
         oscArray[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
         oscArrayOriginFreq[i] = oscArray[i].freq.value;
@@ -55,34 +56,38 @@ $(document).ready(function() {
     }
 
 
-    var scrollVal = scrollAmount();
+    var scrolling = scrollAmount();
 
     timbleInit();
     
 
   $(window).scroll(function () {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
-    for(var i = 0; i < num; ++i) { 
-      oscArray[i].freq.value = 200 + sin_val * oscArrayOriginFreq[i];
+    for(var count = 0; count < num; ++count) { 
+      oscArray[count].freq.value = 200 + sin_val * oscArrayOriginFreq[count];
       
     }
     
   });
 
 
-  setInterval(function(){
-    var array_num = scrollVal();
-    var onTable  =  T("param").linTo(0.2, 100).once("ended", function() {
-      this.linTo(0.0, 300).pause();
-    });
-    //var offTable  = T("param").linTo(0.0, "1sec");
-    
-    for(var i=0; i < array_num; i++) {
-      T("*", oscArray[i], onTable).play();
-      console.log(oscArray[0]);
-    }
+  setInterval( function(){
+    var array_num = scrolling();
+      var onTable = T("param").linTo(0.6, 100).on("ended", function() {
+      this.linTo(0.01, 300);
       
-  }, 150);
+    });
+ 
+    for(var i = 0; i < array_num; i++ ) {
+      T("*", oscArray[i], onTable).play();      
+    }
+
+
+    /*　非常に苦しいがtimbreでオーディオメモリ解放がreset関数しかない　厳しい　*/
+    (array_num == 0)? setTimeout(function(){T.reset();}, 300) : "" ;
+
+    
+  }, 200);
 
 
 
