@@ -6,7 +6,8 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var drawnNum = 5;
+    var oscMelo;
+    var drawnNum = 10;
     var oscDrawn = new Array(drawnNum);
     var oscDrawnOriginFreq = new Array(drawnNum);
     
@@ -21,9 +22,14 @@ $(document).ready(function() {
     function timbleInit() {
 
       for(var i = 0; i < drawnNum; ++i) { 
-        oscDrawn[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
+        oscDrawn[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.08});
         oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
       }
+
+      var meloosc = T("tri");
+      var meloenv =  T("perc", {a:10, r:200});
+      oscMelo = T("OscGen",{ osc:meloosc, env:meloenv,  mul:0.3}).play();
+      
     }
 
     function mtof(val) {
@@ -67,6 +73,12 @@ $(document).ready(function() {
     for(var count = 0; count < drawnNum; ++count) { 
       oscDrawn[count].freq.value = 200 + sin_val * oscDrawnOriginFreq[count];
     }
+    var magicMeloVal = parseInt(1000 * sin_val)
+    if(magicMeloVal % 9 == 0 ){
+      oscMelo.noteOn( ( parseInt(Math.random() * 12)  * 4 ) + 70, 60);
+      console.log(( parseInt(Math.random() * 12)  * 4 ) + 70)
+    }
+  
   });
 
 
@@ -74,7 +86,8 @@ $(document).ready(function() {
     var arrayNum = scrolling();
  
     for(var i = 0; i < arrayNum; i++ ) {
-      T("perc", {a: 100, r:200},oscDrawn[i]).bang().play();      
+      T("perc", {a: 100, r:200},oscDrawn[i]).bang().play();  
+      oscMelo.play()    
     }
 
     /*　非常に苦しいがtimbreでオーディオメモリ解放がreset関数しかない　厳しい　*/
