@@ -6,10 +6,10 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 40;
+    var num = 50;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
-    var envArray = new Array(num);
+    
     var intervalArray = new Array(num);
     var intervalArrayOriginTime = new Array(num);
     
@@ -21,15 +21,9 @@ $(document).ready(function() {
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
         
-        var env = T("adsr", {a:10,d:250, s:0.03, r: 30 });
-        var osc = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
-        oscArray[i] = T("OscGen", { osc:osc,  env:env } ).play();
-        
-        oscArrayOriginFreq[i] = oscArray[i].osc.freq.value;
+        oscArray[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
 
-        
-
-        // //envArrayOriginADSR[i] = 
+        oscArrayOriginFreq[i] = oscArray[i].freq.value;
 
         var interval = T("param", {value: 300 })
         intervalArrayOriginTime[i] = interval.value
@@ -78,7 +72,7 @@ $(document).ready(function() {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
 
     for(var i = 0; i < num; ++i) { 
-      oscArray[i].osc.freq.value = 200 + sin_val * oscArrayOriginFreq[i];
+      oscArray[i].freq.value = 200 + sin_val * oscArrayOriginFreq[i];
       intervalArray[i].interval.value = sin_val  * intervalArrayOriginTime[i] * Math.random() * 20 
     }
     //console.log(intervalArray[0].interval.value);
@@ -89,17 +83,16 @@ $(document).ready(function() {
 
   setInterval(function(){
     var array_num = scrollVal();
-    var onTable  =  T("perc", {r:100}).bang();
-    var offTable  = T("env", { table: [0.04, [0.0, 100]] }).bang();
+    var onTable  =  T("param").linTo(0.1, 100).on("ended", function() {
+      this.linTo(0.0, 100);
+    });;
+    //var offTable  = T("param").linTo(0.0, "1sec");
     
     for(var i=0; i < array_num; i++) {
-      oscArray[i].noteOn(70, 100);
-      oscArray[i].env.set({ env:onTable });
+      T("*", oscArray[i], onTable).play();
+      
     }
-    for(var i=array_num; i < num; i++) {
-      oscArray[i].osc.set({ env:onTable });
-    }
-    
+      
   }, 150);
 
 
