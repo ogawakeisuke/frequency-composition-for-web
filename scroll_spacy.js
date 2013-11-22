@@ -6,7 +6,7 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 50;
+    var num = 20;
     var oscArray = new Array(num);
     var oscArrayOriginFreq = new Array(num);
     
@@ -20,15 +20,8 @@ $(document).ready(function() {
     //
     function timbleInit() {
       for(var i = 0; i < num; ++i) { 
-        
         oscArray[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
-
         oscArrayOriginFreq[i] = oscArray[i].freq.value;
-
-        var interval = T("param", {value: 300 })
-        intervalArrayOriginTime[i] = interval.value
-        intervalArray[i] = T("interval", {interval:interval}, oscArray[i]).start();
-
       }
     }
 
@@ -62,7 +55,6 @@ $(document).ready(function() {
     }
 
 
-
     var scrollVal = scrollAmount();
 
     timbleInit();
@@ -70,27 +62,24 @@ $(document).ready(function() {
 
   $(window).scroll(function () {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
-
     for(var i = 0; i < num; ++i) { 
       oscArray[i].freq.value = 200 + sin_val * oscArrayOriginFreq[i];
-      intervalArray[i].interval.value = sin_val  * intervalArrayOriginTime[i] * Math.random() * 20 
+      
     }
-    //console.log(intervalArray[0].interval.value);
-    //console.log(scaleTonal(oscArray[0].freq.value))
     
   });
 
 
   setInterval(function(){
     var array_num = scrollVal();
-    var onTable  =  T("param").linTo(0.1, 100).on("ended", function() {
-      this.linTo(0.0, 100);
-    });;
+    var onTable  =  T("param").linTo(0.2, 100).once("ended", function() {
+      this.linTo(0.0, 300).pause();
+    });
     //var offTable  = T("param").linTo(0.0, "1sec");
     
     for(var i=0; i < array_num; i++) {
       T("*", oscArray[i], onTable).play();
-      
+      console.log(oscArray[0]);
     }
       
   }, 150);
