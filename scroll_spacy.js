@@ -6,12 +6,12 @@ $(document).ready(function() {
   (function() { 
 
     // グローバルな変数
-    var num = 5;
-    var oscArray = new Array(num);
-    var oscArrayOriginFreq = new Array(num);
+    var drawnNum = 5;
+    var oscDrawn = new Array(drawnNum);
+    var oscDrawnOriginFreq = new Array(drawnNum);
     
-    var intervalArray = new Array(num);
-    var intervalArrayOriginTime = new Array(num);
+    var intervalArray = new Array(drawnNum);
+    var intervalArrayOriginTime = new Array(drawnNum);
     
 
 
@@ -20,9 +20,9 @@ $(document).ready(function() {
     //
     function timbleInit() {
 
-      for(var i = 0; i < num; ++i) { 
-        oscArray[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
-        oscArrayOriginFreq[i] = oscArray[i].freq.value;
+      for(var i = 0; i < drawnNum; ++i) { 
+        oscDrawn[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.04});
+        oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
       }
     }
 
@@ -50,46 +50,37 @@ $(document).ready(function() {
         }else{
           scrollVal = $(window).scrollTop();
           value += 1;
-          return value = (value>num)? num : value ;
+          return value = (value>drawnNum)? drawnNum : value ;
         }
       }
     }
 
-
     var scrolling = scrollAmount();
-
     timbleInit();
     
 
+
+
+
   $(window).scroll(function () {
     var sin_val = Math.sin($(window).scrollTop() * 0.001);
-    for(var count = 0; count < num; ++count) { 
-      oscArray[count].freq.value = 200 + sin_val * oscArrayOriginFreq[count];
-      
+    for(var count = 0; count < drawnNum; ++count) { 
+      oscDrawn[count].freq.value = 200 + sin_val * oscDrawnOriginFreq[count];
     }
-    
   });
 
 
   setInterval( function(){
-    var array_num = scrolling();
-      var onTable = T("param").linTo(0.6, 100).on("ended", function() {
-      this.linTo(0.01, 300);
-      
-    });
+    var arrayNum = scrolling();
  
-    for(var i = 0; i < array_num; i++ ) {
-      T("*", oscArray[i], onTable).play();      
+    for(var i = 0; i < arrayNum; i++ ) {
+      T("perc", {a: 100, r:200},oscDrawn[i]).bang().play();      
     }
 
-
     /*　非常に苦しいがtimbreでオーディオメモリ解放がreset関数しかない　厳しい　*/
-    (array_num == 0)? setTimeout(function(){T.reset();}, 300) : "" ;
-
+    (arrayNum == 0)? setTimeout(function(){T.reset();}, 300) : "" ;
     
   }, 200);
-
-
 
 
 
