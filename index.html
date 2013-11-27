@@ -133,91 +133,111 @@ requestAnimationFrame(function() {
 
 /*---------------------------------------------------*/
 
+
 (function() { 
 
-    // グローバルな変数
-    var oscMelo;
-    var drawnNum = 10;
-    var oscDrawn = new Array(drawnNum);
-    var oscDrawnOriginFreq = new Array(drawnNum);
+  // グローバルな変数
+  var oscMelo;
+  var oscMelo2;
+  var drawnNum = 10;
+  var oscDrawn = new Array(drawnNum);
+  var oscDrawnOriginFreq = new Array(drawnNum);
+  
+  var intervalArray = new Array(drawnNum);
+  var intervalArrayOriginTime = new Array(drawnNum);
+  
+
+
+  //
+  // setup関数
+  //
+  function timbleInit() {
+
+    for(var i = 0; i < drawnNum; ++i) { 
+      oscDrawn[i] = T("sin",{freq: mtof(airNotation(4)) + Math.random()*4, mul:0.04});
+      oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
+    }
+
+    var meloosc = T("tri");
+    var meloenv =  T("perc", {a:10, r:200});
+    oscMelo = T("OscGen",{ osc:meloosc, env:meloenv,  mul:0.05}).play();
     
-    var intervalArray = new Array(drawnNum);
-    var intervalArrayOriginTime = new Array(drawnNum);
-    
+  }
+
+  function mtof(val) {
+    return Math.floor(440*Math.pow(2, (val-69)/12));
+  }
 
 
-    //
-    // setup関数
-    //
-    function timbleInit() {
+  function ftom(frequency) {
+    return(69+12*Math.log(frequency/440)/Math.log(2))
+  }
 
-      for(var i = 0; i < drawnNum; ++i) { 
-        oscDrawn[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.08});
-        oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
+  function scaleTonal(freq) {
+    return mtof(parseInt(ftom(freq) ) ) 
+  }
+
+  function  airNotation(coef) {
+     if(typeof coef === 'undefined') coef = 5;
+    return Math.floor(Math.random()*25) * coef
+  }
+
+  function  cm75Notation() {
+    var target = Math.floor(Math.random()*4)
+    var randOct = Math.floor(Math.random()*5) * 12
+    return ( [0, 4, 8, 11][target] + randOct )
+  }
+
+
+
+  /*　スクロール量で値を変化させる */
+  function scrollAmount() {
+    var value = 0;
+    var scrollVal = 0;
+    return function() {
+      if ( parseInt(camera.position.z) == scrollVal ) {
+        value -= 1;
+        return value = (value<0)? 0 : value ;
+      }else{
+        scrollVal = parseInt(camera.position.z)
+        value += 1;
+        return value = (value>drawnNum)? drawnNum : value ;
       }
-
-      var meloosc = T("tri");
-      var meloenv =  T("perc", {a:10, r:200});
-      oscMelo = T("OscGen",{ osc:meloosc, env:meloenv,  mul:0.3}).play();
-      
     }
-
-    function mtof(val) {
-      return Math.floor(440*Math.pow(2, (val-69)/12));
-    }
+  }
+  var scrolling = scrollAmount();
 
 
-    function ftom(frequency) {
-      return(69+12*Math.log(frequency/440)/Math.log(2))
-    }
-
-    function scaleTonal(freq) {
-      return mtof(parseInt(ftom(freq) ) ) 
-    }
-
-    /*　スクロール量で値を変化させる */
-    function scrollAmount() {
-      var value = 0;
-      var scrollVal = 0;
-      return function() {
-        if ( camera.position.z == scrollVal ) {
-          value -= 1;
-          return value = (value<0)? 0 : value ;
-        }else{
-          scrollVal = camera.position.z;
-          value += 1;
-          return value = (value>drawnNum)? drawnNum : value ;
-        }
-      }
-    }
-
-    var scrolling = scrollAmount();
-    timbleInit();
     
-
-
+  timbleInit();
+    
 
   renderer.domElement.addEventListener('mousewheel', function(e){
-    var z_val = camera.position.z;
-    
+    var z_val = camera.position.z;   
     var sin_val = Math.sin(z_val * 0.001);
+
     for(var count = 0; count < drawnNum; ++count) { 
-      oscDrawn[count].freq.value = 200 + sin_val * oscDrawnOriginFreq[count];
+      oscDrawn[count].freq.value = (sin_val * 4) + oscDrawnOriginFreq[count] ;
     }
     var magicMeloVal = parseInt(1000 * sin_val)
     if(magicMeloVal % 9 == 0 ){
-      oscMelo.noteOn( ( parseInt(Math.random() * 12)  * 4 ) + 70, 60);
+      oscMelo.noteOn( airNotation(), 80);
     }
+    
   })
 
 
+  //動いてない
+  renderer.domElement.addEventListener('drag', function(e){
+    console.log("aaaaa");
+  })
 
 
-  setInterval( function(){    
+  setInterval( function() {    
     var arrayNum = scrolling();
-    console.log(arrayNum)
- 
+  
     for(var i = 0; i < arrayNum; i++ ) {
+      console.log(arrayNum)
       T("perc", {a: 100, r:200},oscDrawn[i]).bang().play();  
       oscMelo.play()    
     }
@@ -225,7 +245,10 @@ requestAnimationFrame(function() {
     /*　非常に苦しいがtimbreでオーディオメモリ解放がreset関数しかない　厳しい　*/
     (arrayNum == 0)? setTimeout(function(){T.reset();}, 300) : "" ;
     
+    
+    
   }, 200);
+
 
 
 
