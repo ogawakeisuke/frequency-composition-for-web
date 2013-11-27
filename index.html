@@ -1,11 +1,240 @@
+<!doctype html>
 <html>
-  <body>
+<head>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.5/mousetrap.js"></script>
+  <script src="http://rawgithub.com/sole/tween.js/r12/build/tween.min.js"></script>
+  <script src="http://threejs.org/build/three.js"></script>
+  <script src="http://threejs.org/examples/js/controls/TrackballControls.js"></script>
+  <script src="http://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
+  <script src="http://mohayonao.github.io/pico.js/misc/jquery.min.js"></script>
+  <script src="src/timble.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; }
+    body {
+      font-family: 'Helvetica Neue';
+      font-size: .8em;
+      background-color: #333;
+      /*background-image: url(http://radiatinglight.files.wordpress.com/2011/06/golden-rays.jpg);
+      */
+      background-image: url(http://www.hdwallpapers.in/walls/windows_xp_bliss-wide.jpg);
+      background-size: cover;
+    }
+    .controls {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 10;
+      background-color: rgba(0, 0, 0, .4);
+      padding: 1em;
+      color: #fff;
+    }
+    .controls:hover {
+      background-color: rgba(0, 0, 0, .6);
+    }
+  </style>
+</head>
+<body>
+ 
+<div class="controls">
+  <input type="checkbox" id="3d">
+  <label for="3d">3D Mode</label>
+</div>
+ 
+<script>
+ 
+var is3D = false;
+var checkbox = document.querySelector('[type=checkbox]');
+ 
+checkbox.onchange = function(e) {
+  if (e.target.checked) {
+    enter3DMode();
+  } else {
+    exit3DMode();
+  }
+};
+ 
+var margin = 0;
+var fov = 75;
+var scene = new THREE.Scene();
+ 
+var aspect = window.innerHeight / window.innerWidth;
+var camera = new THREE.PerspectiveCamera(fov, 1, 1, 100000);
+var defaultZ = camera.position.z = (window.innerWidth * 0.5) / Math.tan(fov * 0.5 * 0.01745) * aspect;
+ 
+var renderer = new THREE.CSS3DRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.position = 'absolute';
+document.body.appendChild(renderer.domElement);
+ 
+var controls = new THREE.TrackballControls(camera, renderer.domElement);
+controls.rotateSpeed = 0.5;
+// controls.addEventListener('change', render);
+ 
+var iframe = document.createElement('iframe');
+iframe.src = 'http://uniba.jp';
+var aspect = window.innerWidth / window.innerHeight;
+iframe.width = window.innerWidth - margin;
+iframe.height = window.innerHeight - margin;
+iframe.setAttribute('frameborder', 0);
+ 
+var object = new THREE.CSS3DObject(iframe);
+scene.add(object);
+ 
+var lastPosition = new THREE.Vector3(0, 0, 1000);
+var lastRotation = new THREE.Euler(0, 0, 0);
+ 
+function enter3DMode() {
+  is3D = true;
+ 
+  var posTween = new TWEEN.Tween(camera.position);
+  var rotTween = new TWEEN.Tween(camera.rotation);
+ 
+  posTween
+  .to(lastPosition, 1000)
+  .easing(TWEEN.Easing.Elastic.Out)
+  .start();
+ 
+  rotTween
+  .to({ x: lastRotation.x, y: lastRotation.y, z: lastRotation.z }, 1000)
+  .easing(TWEEN.Easing.Elastic.Out)
+  .start();
+}
+ 
+function exit3DMode() {
+  is3D = false;
+ 
+  lastPosition = camera.position.clone();
+  lastRotation = camera.rotation.clone();
+ 
+  var posTween = new TWEEN.Tween(camera.position);
+  var rotTween = new TWEEN.Tween(camera.rotation);
+ 
+  posTween
+  .to({ x: 0, y: 0, z: defaultZ }, 1000)
+  .easing(TWEEN.Easing.Exponential.Out)
+  .start();
+ 
+  rotTween
+  .to({ x: 0, y: 0, z: 0 }, 1000)
+  .easing(TWEEN.Easing.Exponential.Out)
+  .start();
+}
+ 
+requestAnimationFrame(function() {
+  requestAnimationFrame(arguments.callee);
+  if (is3D) controls.update();
+  TWEEN.update();
+  renderer.render(scene, camera);
+});
+
+
+
+
+/*---------------------------------------------------*/
+
+(function() { 
+
+    // グローバルな変数
+    var oscMelo;
+    var drawnNum = 10;
+    var oscDrawn = new Array(drawnNum);
+    var oscDrawnOriginFreq = new Array(drawnNum);
     
-    <script src="http://mohayonao.github.io/pico.js/misc/jquery.min.js"></script>
-    <script src="src/timble.js"></script>
-    <script src="src/three.min.js"></script>
-    <script type="text/javascript" src="src/raphael-min.js"></script>
-    <script src="main4.js"></script>
-    <canvas id="wavbase"></canvas>
-  </body>
+    var intervalArray = new Array(drawnNum);
+    var intervalArrayOriginTime = new Array(drawnNum);
+    
+
+
+    //
+    // setup関数
+    //
+    function timbleInit() {
+
+      for(var i = 0; i < drawnNum; ++i) { 
+        oscDrawn[i] = T("sin", {freq: Math.random()*400 + 100, mul:0.08});
+        oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
+      }
+
+      var meloosc = T("tri");
+      var meloenv =  T("perc", {a:10, r:200});
+      oscMelo = T("OscGen",{ osc:meloosc, env:meloenv,  mul:0.3}).play();
+      
+    }
+
+    function mtof(val) {
+      return Math.floor(440*Math.pow(2, (val-69)/12));
+    }
+
+
+    function ftom(frequency) {
+      return(69+12*Math.log(frequency/440)/Math.log(2))
+    }
+
+    function scaleTonal(freq) {
+      return mtof(parseInt(ftom(freq) ) ) 
+    }
+
+    /*　スクロール量で値を変化させる */
+    function scrollAmount() {
+      var value = 0;
+      var scrollVal = 0;
+      return function() {
+        if ( camera.position.z == scrollVal ) {
+          value -= 1;
+          return value = (value<0)? 0 : value ;
+        }else{
+          scrollVal = camera.position.z;
+          value += 1;
+          return value = (value>drawnNum)? drawnNum : value ;
+        }
+      }
+    }
+
+    var scrolling = scrollAmount();
+    timbleInit();
+    
+
+
+
+  renderer.domElement.addEventListener('mousewheel', function(e){
+    var z_val = camera.position.z;
+    
+    var sin_val = Math.sin(z_val * 0.001);
+    for(var count = 0; count < drawnNum; ++count) { 
+      oscDrawn[count].freq.value = 200 + sin_val * oscDrawnOriginFreq[count];
+    }
+    var magicMeloVal = parseInt(1000 * sin_val)
+    if(magicMeloVal % 9 == 0 ){
+      oscMelo.noteOn( ( parseInt(Math.random() * 12)  * 4 ) + 70, 60);
+    }
+  })
+
+
+
+
+  setInterval( function(){    
+    var arrayNum = scrolling();
+    console.log(arrayNum)
+ 
+    for(var i = 0; i < arrayNum; i++ ) {
+      T("perc", {a: 100, r:200},oscDrawn[i]).bang().play();  
+      oscMelo.play()    
+    }
+
+    /*　非常に苦しいがtimbreでオーディオメモリ解放がreset関数しかない　厳しい　*/
+    (arrayNum == 0)? setTimeout(function(){T.reset();}, 300) : "" ;
+    
+  }, 200);
+
+
+
+  })();
+
+
+
+ 
+</script>
+ 
+</body>
 </html>
