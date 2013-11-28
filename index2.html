@@ -164,7 +164,7 @@ requestAnimationFrame(function() {
       filterOriginFreq[i] = filterArray[i].freq.value;
     }
 
-    var meloosc = T("tri", {freq: mtof(airNotation()), mul:0.5});
+    var meloosc = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
     var meloenv =  T("perc", {a:2, r:30}, meloosc).bang();
     var interval = T("param", {value:1000});
 
@@ -189,7 +189,12 @@ requestAnimationFrame(function() {
 
   function  airNotation(coef) {
      if(typeof coef === 'undefined') coef = 5;
-    return Math.floor(Math.random()*25) * coef
+    return Math.floor(Math.random()*25) * 5
+  }
+
+
+  function  airNoteMelody() {
+    return Math.floor(Math.random()*15 + 5) * 5
   }
 
   function  cm75Notation() {
