@@ -98,9 +98,7 @@ function enter3DMode() {
   rotTween
   .to({ x: lastRotation.x, y: lastRotation.y, z: lastRotation.z }, 1000)
   .easing(TWEEN.Easing.Elastic.Out)
-  .start();
-
-  
+  .start();  
 }
  
 function exit3DMode() {
@@ -158,7 +156,7 @@ requestAnimationFrame(function() {
   function timbleInit() {
 
     for(var i = 0; i < drawnNum; ++i) { 
-      oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02});
+      oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02}).play();
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
       /*sawオシレーターかけてローパスかけたらいい感じに*/
@@ -206,7 +204,6 @@ requestAnimationFrame(function() {
     for(var count = 0; count < drawnNum; ++count) { 
       oscDrawn[count].freq.value = (sin_val * 4) + oscDrawnOriginFreq[count] ;
       filterArray[count].freq.value = (sin_val * 300) + filterOriginFreq[count];
-      oscDrawn[count].play()
     }
 
   })
