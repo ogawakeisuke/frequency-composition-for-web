@@ -18,7 +18,7 @@
       background-color: #333;
       /*background-image: url(http://radiatinglight.files.wordpress.com/2011/06/golden-rays.jpg);
       */
-      background-image: url(http://www.hdwallpapers.in/walls/windows_xp_bliss-wide.jpg);
+      background-image: url(http://www.freefever.com/stock/new-earth-space-pictures-images.jpg);
       background-size: cover;
     }
     .controls {
@@ -148,8 +148,9 @@ requestAnimationFrame(function() {
   var intervalArray = new Array(drawnNum);
   var intervalArrayOriginTime = new Array(drawnNum);
   
-  var filterArray = new Array(drawnNum);
-  var filterOriginFreq = new Array(drawnNum);
+  var cutoffArray = new Array(drawnNum);
+  var cutoffOriginFreq = new Array(drawnNum);
+
 
 
   //
@@ -161,9 +162,10 @@ requestAnimationFrame(function() {
       oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02});
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
-      /*sawオシレーターかけてローパスかけたらいい感じに*/
-      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]).play();
-      filterOriginFreq[i] = filterArray[i].freq.value;
+      cutoffArray[i] = T("sin", {freq: Math.floor(Math.random()*300)+"ms", mul:300, add:1760}).kr();
+      cutoffOriginFreq[i] = cutoffArray[i].mul
+
+      T("lpf" , {cutoff:cutoffArray[i], Q:12}, oscDrawn[i]).play();
     }
 
     
@@ -204,19 +206,18 @@ requestAnimationFrame(function() {
     var sin_val = Math.sin(z_val * 0.001);
 
     for(var count = 0; count < drawnNum; ++count) { 
-      oscDrawn[count].freq.value = (sin_val * 4) + oscDrawnOriginFreq[count] ;
-      filterArray[count].freq.value = (sin_val * 300) + filterOriginFreq[count];
-      oscDrawn[count].play()
+      oscDrawn[count].freq.value = (sin_val * 6) + oscDrawnOriginFreq[count];
+
+      cutoffArray[count].freq.value = (  Math.sqrt((sin_val * sin_val)) * 10)
+      cutoffArray[count].bang();
     }
-
+  
   })
 
 
 
-  //動いてない
-  renderer.domElement.addEventListener('drag', function(e){
-    console.log("aaaaa");
-  })
+
+
 
 
 
