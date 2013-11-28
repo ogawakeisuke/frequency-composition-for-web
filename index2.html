@@ -162,7 +162,7 @@ requestAnimationFrame(function() {
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
       /*sawオシレーターかけてローパスかけたらいい感じに*/
-      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]);
+      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]).play();
       filterOriginFreq[i] = filterArray[i].freq.value;
     }
 

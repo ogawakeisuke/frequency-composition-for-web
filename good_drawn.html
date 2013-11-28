@@ -156,11 +156,11 @@ requestAnimationFrame(function() {
   function timbleInit() {
 
     for(var i = 0; i < drawnNum; ++i) { 
-      oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02}).play();
+      oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02});
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
       /*sawオシレーターかけてローパスかけたらいい感じに*/
-      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]);
+      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]).play();
       filterOriginFreq[i] = filterArray[i].freq.value;
     }
 
@@ -202,7 +202,7 @@ requestAnimationFrame(function() {
     var sin_val = Math.sin(z_val * 0.001);
 
     for(var count = 0; count < drawnNum; ++count) { 
-      oscDrawn[count].freq.value = (sin_val * 4) + oscDrawnOriginFreq[count] ;
+      oscDrawn[count].freq.value = (sin_val * 4) + oscDrawnOriginFreq[count];
       filterArray[count].freq.value = (sin_val * 300) + filterOriginFreq[count];
     }
 
