@@ -147,6 +147,9 @@ requestAnimationFrame(function() {
   var filterArray = new Array(drawnNum);
   var filterOriginFreq = new Array(drawnNum);
 
+  var moursOsc;
+  var mmoursEnv;
+
 
   //
   // setup関数
@@ -173,6 +176,14 @@ requestAnimationFrame(function() {
 
     T("interval", {interval:interval}, meloenv).start();
     meloenv.play();
+
+
+    moursOsc = T("tri", {freq: mtof(airNoteMelody()), mul:0.25});
+    var moursFilter = T("bandpass" , {freq:1000 + (Math.random()*100), Q:5}, moursOsc)
+    mmoursEnv =  T("env", {table: [0.8, [0.8, 100],[0, 5]]}, moursFilter).bang();
+    T("delay", {time:300, fb:0.6, mix:0.5}, mmoursEnv).play();
+    
+
     
   }
 
@@ -217,10 +228,8 @@ requestAnimationFrame(function() {
 
     for(var count = 0; count < drawnNum; ++count) { 
       filterArray[count].freq.value = (sin_val * 300) + filterOriginFreq[count];
-    }
-
-    for(var ii = 80; ii < drawnNum; ++ii) {
-      oscDrawn[ii].freq.value = (sin_val * 4) + oscDrawnOriginFreq[ii];
+      oscDrawn[count].freq.value = (sin_val * 8) + oscDrawnOriginFreq[count];
+      moursOsc.freq.value =  (sin_val * 10) + moursOsc.freq.value;
     }
     
   })
@@ -234,6 +243,14 @@ requestAnimationFrame(function() {
     timbleInit();
   }, 120000)
 
+
+
+  setInterval( function() {    
+    if(Math.floor(Math.random()*3) % 3 == 0) {
+      moursOsc.freq.value = mtof(airNoteMelody());
+      mmoursEnv.bang().play();
+    }
+  }, 80);
 
 
 

@@ -12,7 +12,8 @@
 <script>
 
 (function() { 
-  var interval;
+  var moursOsc;
+  var mmoursEnv;
   
   
   //
@@ -20,13 +21,10 @@
   //
   function timbleInit() {
 
-    var osc = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
-    var filter = T("lpf" , {cutoff:100 + (Math.random()*100), Q:12}, osc)
-    var meloenv =  T("env", {table: [0.8, [0.8, 300],[0, 5]]}, filter).bang();
-    interval = T("param", {value:1000});
-
-    T("interval", {interval:interval}, meloenv).start();
-    meloenv.play();
+    moursOsc = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
+    var moursFilter = T("lpf" , {cutoff:100 + (Math.random()*100), Q:12}, moursOsc)
+    mmoursEnv =  T("env", {table: [0.8, [0.8, 100],[0, 5]]}, moursFilter).bang();
+    mmoursEnv.play();
     
   }
 
@@ -42,12 +40,14 @@
 
   timbleInit();
 
-  $(window).scroll(function () {
-    var sin_val = Math.sin($(window).scrollTop() * 0.001);
-    interval.value = sin_val * 50000
-    console.log(sin_val * 10000);
+  
 
-  });
+  setInterval( function() {    
+    if(Math.floor(Math.random()*3) % 3 == 0) {
+      moursOsc.freq.value = mtof(airNoteMelody());
+      mmoursEnv.bang().play();
+    }
+  }, 50);
 
 
 })();
