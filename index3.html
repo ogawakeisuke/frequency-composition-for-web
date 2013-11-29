@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
+  <script src="src/timble.js"></script>
+</head>
+<body>
+ 
+
+
+
+<script>
+
+(function() { 
+  var interval;
+  
+  
+  //
+  // setup関数
+  //
+  function timbleInit() {
+
+    var osc = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
+    var filter = T("lpf" , {cutoff:100 + (Math.random()*100), Q:12}, osc)
+    var meloenv =  T("env", {table: [0.8, [0.8, 300],[0, 5]]}, filter).bang();
+    interval = T("param", {value:1000});
+
+    T("interval", {interval:interval}, meloenv).start();
+    meloenv.play();
+    
+  }
+
+
+  function  airNoteMelody() {
+    return Math.floor(Math.random()*15 + 7) * 5
+  }
+
+  function mtof(val) {
+    return Math.floor(440*Math.pow(2, (val-69)/12));
+  }
+
+
+  timbleInit();
+
+  $(window).scroll(function () {
+    var sin_val = Math.sin($(window).scrollTop() * 0.001);
+    interval.value = sin_val * 50000
+    console.log(sin_val * 10000);
+
+  });
+
+
+})();
+ 
+</script>
+ 
+</body>
+</html>

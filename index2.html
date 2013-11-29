@@ -7,7 +7,6 @@
   <script src="http://threejs.org/examples/js/controls/TrackballControls.js"></script>
   <script src="http://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
-  <script src="http://mohayonao.github.io/pico.js/misc/jquery.min.js"></script>
   <script src="src/timble.js"></script>
   
   <style>
@@ -137,8 +136,7 @@ requestAnimationFrame(function() {
 (function() { 
 
   // グローバルな変数
-  var oscMelo;
-  var oscMelo2;
+  
   var drawnNum = 120;
   var oscDrawn = new Array(drawnNum);
   var oscDrawnOriginFreq = new Array(drawnNum);
@@ -159,18 +157,22 @@ requestAnimationFrame(function() {
       oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02});
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
+
       /*sawオシレーターかけてローパスかけたらいい感じに*/
-      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]).play();
+      filterArray[i] = T("lpf" , {cutoff:400 + (Math.random()*100), Q:12}, oscDrawn[i]);
       filterOriginFreq[i] = filterArray[i].freq.value;
+
+      /*イントロ用にアタック弱めにしてみるテスト*/
+      var param = T("param").linTo(1, "5sec")
+      T("*", filterArray[i], param).play();
     }
 
-    var meloosc = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
-    var meloenv =  T("perc", {a:2, r:30}, meloosc).bang();
+    var oscMelo = T("tri", {freq: mtof(airNoteMelody()), mul:0.5});
+    var meloenv =  T("perc", {a:2, r:30}, oscMelo).bang();
     var interval = T("param", {value:1000});
 
     T("interval", {interval:interval}, meloenv).start();
-    oscMelo = meloenv.play();
-
+    meloenv.play();
     
   }
 
@@ -194,7 +196,7 @@ requestAnimationFrame(function() {
 
 
   function  airNoteMelody() {
-    return Math.floor(Math.random()*15 + 5) * 5
+    return Math.floor(Math.random()*15 + 7) * 5
   }
 
   function  cm75Notation() {
@@ -220,15 +222,17 @@ requestAnimationFrame(function() {
     for(var ii = 80; ii < drawnNum; ++ii) {
       oscDrawn[ii].freq.value = (sin_val * 4) + oscDrawnOriginFreq[ii];
     }
-
+    
   })
 
 
 
-  //動いてない
-  renderer.domElement.addEventListener('drag', function(e){
-    console.log("aaaaa");
-  })
+
+
+  setInterval(function() { 
+    T.reset();
+    timbleInit();
+  }, 120000)
 
 
 
