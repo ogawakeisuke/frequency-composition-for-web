@@ -149,15 +149,18 @@ requestAnimationFrame(function() {
 
   var moursOsc;
   var mmoursEnv;
+  var randomNote;
 
 
   //
   // setup関数
   //
   function timbleInit() {
+    randomNote = randomNoteDefine()
+    console.log(randomNote)
 
     for(var i = 0; i < drawnNum; ++i) { 
-      oscDrawn[i] = T("saw",{freq: mtof(airNotation()) + Math.random()*4, mul:0.02});
+      oscDrawn[i] = T("saw",{freq: mtof(randomNote.drawn()) + Math.random()*4, mul:0.02});
       oscDrawnOriginFreq[i] = oscDrawn[i].freq.value;
 
 
@@ -200,8 +203,7 @@ requestAnimationFrame(function() {
     return mtof(parseInt(ftom(freq) ) ) 
   }
 
-  function  airNotation(coef) {
-     if(typeof coef === 'undefined') coef = 5;
+  function  airNotation() {
     return Math.floor(Math.random()*25) * 5
   }
 
@@ -212,8 +214,28 @@ requestAnimationFrame(function() {
 
   function  cm75Notation() {
     var target = Math.floor(Math.random()*4)
-    var randOct = Math.floor(Math.random()*5) * 12
+    var randOct = Math.floor(Math.random()*5 + 2) * 12
     return ( [0, 4, 8, 11][target] + randOct )
+  }
+
+  function  myDarkNotation(coef) {
+    if(typeof coef === 'undefined') coef = 2;
+    var target = Math.floor(Math.random()*4)
+    var randOct = Math.floor(Math.random()*5 + coef) * 12
+    return ( [0, 2, 4, 9, 11][target] + randOct )
+  }
+
+  function randomNoteDefine() {
+    var target = Math.floor(Math.random()* 2)
+    if (target == 1 ) {
+      return {
+        drawn: function() { return airNotation() }, melody: function() { return airNoteMelody() }
+      }
+    } else {
+       return {
+        drawn: function() { return myDarkNotation() }, melody: function() { return myDarkNotation(5) }
+      }
+    }
   }
 
 
@@ -247,7 +269,7 @@ requestAnimationFrame(function() {
 
   setInterval( function() {    
     if(Math.floor(Math.random()*3) % 3 == 0) {
-      moursOsc.freq.value = mtof(airNoteMelody());
+      moursOsc.freq.value = mtof(randomNote.melody());
       mmoursEnv.bang().play();
     }
   }, 80);
